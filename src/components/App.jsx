@@ -1,67 +1,65 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { Searchbar } from './Searchbar/Searchbar';
-import apiRequest from './PixabayAPI/PixabayAPI';
+import apiRequest from '../API/PixabayAPI';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Loader from './Loader/Loader';
 import Button from './Button/Button';
 
-export class App extends Component {
-  state = {
-    query: '',
-    page: 1,
-    hits: [],
-    totalHits: 0,
-    loading: false,
-  };
+export const App = () => {
+  const [query, setQuery] = useState(null);
+  const [page, setPage] = useState(1);
+  const [hits, setHits] = useState([]);
+  const [totalHits, settotalHits] = useState(0);
+  const [loading, setloading] = useState(false);
 
-  componentDidUpdate(prevProps, prevState) {
-    const { query, page } = this.state;
-    if (prevState.query !== query) {
-      this.formFetch(query);
-    }
-
+  useEffect(() => {
     if (query === '') {
       return alert('Поле пошуку не може бути пустим!');
     }
-    if (prevState.page !== page && page !== 1) {
-      this.updatePage(prevState, page);
-    }
-  }
 
-  formFetch = async query => {
+    if (query) formFetch(query);
+  }, [query]);
+
+  useEffect(() => {
+    if (page !== 1) {
+      updatePage(hits, page);
+    }
+    // eslint-disable-next-line
+  }, [page]);
+
+  const formFetch = async query => {
     if (query === '') {
       return;
-    } else this.setState({ loading: true });
+    } else setloading(true);
     const { totalHits, hits } = await apiRequest(query, 1);
-    this.setState({ totalHits, hits, page: 1, loading: false });
+    setloading(false);
+    settotalHits(totalHits);
+    setHits(hits);
+    setPage(1);
   };
 
-  updateQuery = query => {
-    this.setState({ query });
+  const updatePage = async (prevState, page) => {
+    setloading(true);
+    const data = await apiRequest(query, page);
+    setHits([...hits, ...data.hits]);
+    setPage(page);
+    setloading(false);
   };
 
-  loadMore = () => {
-    this.setState(({ page }) => ({ page: page + 1 }));
+  const updateQuery = query => {
+    setQuery(query);
   };
 
-  updatePage = async (prevState, page) => {
-    this.setState({ loading: true });
-    const query = this.state.query;
-    const { hits } = await apiRequest(query, page);
-    this.setState({ hits: [...prevState.hits, ...hits], page });
-    this.setState({ loading: false });
+  const loadMore = () => {
+    setPage(page + 1);
   };
 
-  render() {
-    const { hits, loading, totalHits, page } = this.state;
-
-    return (
-      <>
-        <Searchbar onSubmit={this.updateQuery} />
-        <ImageGallery images={hits} />
-        {page < totalHits && <Button loadMore={this.loadMore} />}
-        {loading && <Loader />}
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <Searchbar onSubmit={updateQuery} />
+      <ImageGallery images={hits} />
+      {page < totalHits && <Button loadMore={loadMore} />}
+      {loading && <Loader />}
+    </>
+  );
+};

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import css from './ImageGalleryItem.module.css';
+
 import { Modal } from 'components/Modal/Modal';
+import css from './ImageGalleryItem.module.css';
 
 export const ImageGalleryItem = ({ img }) => {
   const [modalShow, setModalShow] = useState(false);

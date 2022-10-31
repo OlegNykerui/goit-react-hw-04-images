@@ -1,6 +1,7 @@
 import { Component } from 'react';
-import css from './Searchbar.module.css';
 import { MdFindInPage } from 'react-icons/md';
+
+import css from './Searchbar.module.css';
 
 export class Searchbar extends Component {
   state = {

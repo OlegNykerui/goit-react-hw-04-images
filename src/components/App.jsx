@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Searchbar } from './Searchbar/Searchbar';
+
 import apiRequest from '../API/PixabayAPI';
+import { Searchbar } from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Loader from './Loader/Loader';
 import Button from './Button/Button';
